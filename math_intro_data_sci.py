@@ -28,7 +28,8 @@ import statsmodels as sm
 sec_1_4_sw = False
 sec_1_5_sw = False
 sec_1_6_sw = False
-sec_1_7_sw = True
+sec_1_7_sw = False
+sec_1_8_sw = True
 
 
 #
@@ -125,14 +126,14 @@ if sec_1_5_sw:
 #
 
 if sec_1_6_sw:
-    #
+    # loading dataset
     dataset_url1 = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
     dataset_url2 = 'https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv'
     col_names1 = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species']
     df1 = pd.read_csv(dataset_url1, header=None, names=col_names1)
     df2 = pd.read_csv(dataset_url2, sep=';')
     
-    #
+    # manipulations
     dataset1_shape,     dataset2_shape     = df1.shape,   df2.shape
     dataset1_head,      dataset2_head      = df1.head(),  df2.head()
     dataset1_row_index, dataset2_row_index = df1.index,   df2.index
@@ -168,8 +169,79 @@ if sec_1_6_sw:
 #
 
 if sec_1_7_sw == True:
-    #
+    # loading dataset
     dataset1 = sld.load_iris()
+    dataset2 = sld.load_wine()
+    
+    # manipulations
+    dataset1_type, dataset2_type = type(dataset1), type(dataset2)
+    dataset1_keys, dataset2_keys = dataset1.keys(), dataset2.keys()
+    dataset1_feature, dataset2_feature = dataset1.feature_names, dataset2.feature_names
+    dataset1_target, dataset2_target = dataset1.target_names, dataset2.target_names
+    dataset1_data_type, dataset2_data_type = type(dataset1.data), type(dataset2.data)
+    dataset1_data_shape, dataset2_data_shape = dataset1.data.shape, dataset2.data.shape
+    # sklearn.datasets -> pandas.DataFrame
+    dataset1_df = pd.DataFrame(data=dataset1.data, columns=dataset1.feature_names)
+    dataset2_df = pd.DataFrame(data=dataset2.data, columns=dataset2.feature_names)
+    #
+    output_format  = 'type 1/2 = %s/%s' + '\n'
+    output_format += 'keys 1 = %s' + '\n'
+    output_format += 'keys 2 = %s' + '\n'
+    output_format += 'feature names 1 = %s' + '\n'
+    output_format += 'feature names 2 = %s' + '\n'
+    output_format += 'target names 1 = %s' + '\n'
+    output_format += 'target names 2 = %s' + '\n'
+    output_format += 'data type 1/2 = %s/%s' + '\n'
+    output_format += 'data shape 1/2 = %s/%s' + '\n'
+    output_value  = [dataset1_type, dataset2_type]
+    output_value += [dataset1_keys, dataset2_keys]
+    output_value += [dataset1_feature, dataset2_feature, dataset1_target, dataset2_target]
+    output_value += [dataset1_data_type, dataset2_data_type, dataset1_data_shape, dataset2_data_shape]
+    output_value = tuple(output_value)
+    output_string = output_format % output_value
+    print(output_string)
+
+
+
+#
+# 1.8 visualization with matplotlib
+#
+
+if sec_1_8_sw == True:
+    # loading dataset
+    dataset1 = sld.load_iris()
+    dataset2 = sld.load_wine()
+
+    # manipulations
+    dataset1_x = dataset1.data
+    dataset1_xname = dataset1.feature_names
+    dataset1_y = dataset1.target
+    dataset1_yname = dataset1.target_names
+    dataset1_size = (dataset1_x[:,2] - dataset1_x[:,2].min()) / (dataset1_x[:,2].max() - dataset1_x[:,2].min()) * 150.0
+
+    # visualization
+    makers = 'o^d'
+    fig, ax = plt.subplots(2, 2, figsize=(10,6))
+    # plot
+    for each_index, each_name in enumerate(dataset1_yname):
+        ax[0,0].plot(dataset1_x[dataset1_y==each_index, 0], dataset1_x[dataset1_y==each_index, 1], makers[each_index], label=each_name)
+    ax[0,0].grid(ls=':')
+    ax[0,0].legend(fontsize=8)
+    ax[0,0].set_xlabel(dataset1_xname[0])
+    ax[0,0].set_ylabel(dataset1_xname[1])
+    # scatter
+    scatter = ax[0,1].scatter(dataset1_x[:,0], dataset1_x[:,1], c=dataset1_y, s=dataset1_size, cmap='viridis')
+    ax[0,1].grid(ls=':')
+    ax[0,1].set_xlabel(dataset1_xname[0])
+    ax[0,1].set_ylabel(dataset1_xname[1])
+    legend_cbar = fig.colorbar(scatter, ax=ax[0,1], ticks=[0, 1, 2])
+    plt.tight_layout()
+    plt.savefig('dataset_iris.png', format='png', dpi=300)
+    plt.show()
+
+
+
+
 
 
 
